@@ -29,19 +29,34 @@ for suite in testfile:
     program = suite['program']
     log.warning('Testing: ' + str(program) + ' ' + '=' * (80 - 1 - len('Testing: ' + str(program))))
     for test in suite['tests']:
+
+        # Check for arguments
         try:
-            output = subprocess.run([*program, test['args']], stdout=subprocess.PIPE, input=test['in'].encode('utf-8'))
+            arguments = test['args']
         except KeyError:
-            output = subprocess.run([*program], stdout=subprocess.PIPE, input=test['in'].encode('utf-8'))
+            arguments = ''
 
-        output = output.stdout.decode('utf-8').strip()
+        run = subprocess.run([*program, test['args']],
+                             input=test['in'].encode('utf-8'),
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.PIPE)
 
-        if output != test['out']:
+        stdout = run.stdout.decode('utf-8').strip()
+        stderr = run.stderr.decode('utf-8').strip()
+
+        # check for stderr
+        try:
+            expected_stderr = test['stderr']
+        except KeyError:
+            expected_stderr = ''
+
+
+        if stdout != test['out'] or stderr != expected_stderr:
             log.error('Test failed: ' + test['name'])
 
             log.warning('  In: ' + test['in'])
             log.warning('  Expected: ' + test['out'])
-            log.warning('  Out: ' + output)
+            log.warning('  Out: ' + stdout)
             log.error('=' * 80)
 
             num_tests['failed'] += 1

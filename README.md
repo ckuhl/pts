@@ -11,10 +11,9 @@ those problems:
   test cases I have.
 - Being easy to break (as comes with little experience in shell scripting)
 
-## Contents
-- `test.py` the testing script
-- `Testfile` example test cases
-- `ex.py` an example script to test against
+## Getting started
+You'll need the PyYAML module installed, and then simply add the script to your
+script directory to use it wherever.
 
 ## Usage
     $ test.py
@@ -24,7 +23,7 @@ those problems:
       Expected: 0
       Out: 1
     ================================================================================
-    5 tests run, with 4 successful and 1 failing
+    4 tests run, with 3 successful and 1 failing
 
 ## Format
     ---
@@ -40,10 +39,6 @@ those problems:
         args: "-m"
         out: "6"
 
-      - name: "Multiple addition"
-        in: "1 2 3 4 5"
-        out: "15"
-
       - name: "Failing test"
         in: "1"
         out: "0"
@@ -56,4 +51,15 @@ those problems:
         out: "6"
 
     ...
+
+## Generally
+
+    ---
+    program: REQUIRED
+    tests: REQUIRED
+      - name: REQUIRED
+        in: REQUIRED
+        args: OPTIONAL
+        out: REQUIRED
+...
 
