@@ -20,7 +20,7 @@ tests:
     out: "0"
 
   - name: "Multiline test"
-    in: |
+    in: |+
          1
          2
          3

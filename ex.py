@@ -23,5 +23,5 @@ for line in sys.stdin:
     for num in line.split():
         output = op(output, int(num))
 
-print(output)
+print(output, end='')
 

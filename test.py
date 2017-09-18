@@ -8,16 +8,18 @@ import sys
 import yaml
 
 
+# command line options
 parser = argparse.ArgumentParser(
         prog='pts - Python Test Suite',
         description='Run plaintext tests against scripts')
 parser.add_argument(
         '--verbose', '-v',
-        help='add verbosity',
+        help='add verbosity (-v to -vvvv)',
         action='count',
         default=0)
-
 args = parser.parse_args()
+
+# configure logging (logger and console handler)
 verb_log = {
         0: logging.CRITICAL,
         1: logging.ERROR,
@@ -25,13 +27,14 @@ verb_log = {
         3: logging.INFO,
         4: logging.DEBUG,
 }
-
-# set up logging
-log = logging.Logger(__name__)
+log = logging.getLogger(__name__)
 log.setLevel(verb_log[args.verbose])
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+log.addHandler(ch)
 
 
-# gather files
+# beginning of script
 files = [ f for f in os.listdir( os.curdir ) if os.path.isfile(f) ]
 testfile = None
 
@@ -39,9 +42,10 @@ testfile = None
 if 'Testfile' in files:
     testfile = yaml.load_all(open('Testfile', 'r'))
 else:
+    log.info('No Testfile found in current directory')
     sys.exit()
 
-# test counts
+# test counter
 num_tests = {'succeeded': 0, 'failed': 0, 'total': 0}
 
 # loop through test cases
@@ -61,31 +65,38 @@ for suite in testfile:
                              stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
 
-        stdout = run.stdout.decode('utf-8').strip()
-        stderr = run.stderr.decode('utf-8').strip()
-
-        # check for stderr
+        # gather outputs
+        stdout = run.stdout.decode('utf-8')
+        stderr = run.stderr.decode('utf-8')
+        expected_stdout = test['out']
         try:
             expected_stderr = test['stderr']
         except KeyError:
             expected_stderr = ''
 
-
-        if stdout != test['out'] or stderr != expected_stderr:
+        # error logging
+        if stdout != expected_stdout or stderr != expected_stderr:
             log.error('Test failed: ' + test['name'])
+            log.warning('  stdin: ' + test['in'])
 
-            log.warning('  In: ' + test['in'])
-            log.warning('  Expected: ' + test['out'])
-            log.warning('  Out: ' + stdout)
-            log.error('=' * 80)
+            if stdout != expected_stdout:
+                log.warning('  expected_stdout: ' + expected_stdout)
+                log.warning('  stdout: ' + stdout)
+
+            if stderr != expected_stderr:
+                log.warning('  expected_stderr: ' + expected_stderr)
+                log.warning('  stderr: ' + stderr)
+                log.error('=' * 80)
 
             num_tests['failed'] += 1
+
         else:
             log.debug('Test succeeded: ' + test['name'])
-            log.debug('=' * 80)
             num_tests['succeeded'] += 1
+
         num_tests['total'] += 1
 
+    log.debug('=' * 80)
 
 log.info(str(num_tests['total']) + ' tests run, with ' + str(num_tests['succeeded']) + ' successful and ' + str(num_tests['failed']) + ' failing')
 
