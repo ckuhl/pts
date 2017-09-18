@@ -8,7 +8,7 @@ tests:
 
   - name: "Multiplication"
     in: "2 3"
-    args: "-m"
+    args: [-m]
     out: "6"
 
   - name: "Multiple addition"
