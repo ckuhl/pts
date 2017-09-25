@@ -13,6 +13,11 @@ parser = argparse.ArgumentParser(
         prog='pts - Python Test Suite',
         description='Run plaintext tests against scripts')
 parser.add_argument(
+        'test_name',
+        help='Optional test name to run only one suite',
+        nargs='?',
+        default='')
+parser.add_argument(
         '--verbose', '-v',
         help='add verbosity (-v to -vvvv)',
         action='count',
@@ -54,8 +59,17 @@ for suite in testfile:
     log.info('Testing: %s %s',
             program,
             '=' * (80 - 1 - len('Testing: ' + str(program))))
+
+    # check that suite name matches
     try:
-        log.info(suite['name'])
+        log.info("%s %s",
+                suite['name'],
+                '=' * (80 - 1 - len(suite['name'])))
+        if args.test_name:
+            if suite['name'] == args.test_name:
+                pass
+            else:
+                continue
     except KeyError:
         pass
 
