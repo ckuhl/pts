@@ -93,7 +93,8 @@ for suite in testfile:
         try:
             expected_stderr = test['stderr']
         except KeyError:
-            expected_stderr = ''
+            expected_stderr = None
+            stderr = None
 
         # error logging
         if stdout != expected_stdout or stderr != expected_stderr:
