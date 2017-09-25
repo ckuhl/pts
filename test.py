@@ -34,11 +34,11 @@ ch.setLevel(logging.DEBUG)
 log.addHandler(ch)
 
 
-# beginning of script
+# get files in invoking directory
 files = [ f for f in os.listdir( os.curdir ) if os.path.isfile(f) ]
 testfile = None
 
-# check that a testfile is there
+# look for a Testfile
 if 'Testfile' in files:
     testfile = yaml.load_all(open('Testfile', 'r'))
 else:
@@ -51,7 +51,14 @@ num_tests = {'succeeded': 0, 'failed': 0, 'total': 0}
 # loop through test cases
 for suite in testfile:
     program = suite['program']
-    log.warning('Testing: ' + str(program) + ' ' + '=' * (80 - 1 - len('Testing: ' + str(program))))
+    log.info('Testing: %s %s',
+            program,
+            '=' * (80 - 1 - len('Testing: ' + str(program))))
+    try:
+        log.info(suite['name'])
+    except KeyError:
+        pass
+
     for test in suite['tests']:
 
         # Check for arguments
@@ -76,27 +83,33 @@ for suite in testfile:
 
         # error logging
         if stdout != expected_stdout or stderr != expected_stderr:
-            log.error('Test failed: ' + test['name'])
-            log.warning('  stdin: ' + test['in'])
+            log.error('Test failed: %s', test['name'])
+            log.warning('  stdin: %s', test['in'])
 
             if stdout != expected_stdout:
-                log.warning('  expected_stdout: ' + expected_stdout)
+                log.warning('  expected_stdout: %s', expected_stdout)
                 log.warning('  stdout: ' + stdout)
+                if len(expected_stdout) != len(stdout):
+                    log.warning('  expected len: %d,  Actual len: %d',
+                            len(expected_stdout), len(stdout))
 
             if stderr != expected_stderr:
-                log.warning('  expected_stderr: ' + expected_stderr)
-                log.warning('  stderr: ' + stderr)
-                log.error('=' * 80)
+                log.warning('  expected_stderr: %s', expected_stderr)
+                log.warning('  stderr: %s', stderr)
+                if len(expected_stderr) != len(stderr):
+                    log.warning('  expected len: %d, actual len: %d',
+                            len(expected_stderr), len(stderr))
 
             num_tests['failed'] += 1
 
         else:
-            log.debug('Test succeeded: ' + test['name'])
+            log.debug('Test succeeded: %s', test['name'])
             num_tests['succeeded'] += 1
 
         num_tests['total'] += 1
 
     log.debug('=' * 80)
 
-log.info(str(num_tests['total']) + ' tests run, with ' + str(num_tests['succeeded']) + ' successful and ' + str(num_tests['failed']) + ' failing')
+log.warning('%d tests run, with %d successful and %d failing',
+        num_tests['total'], num_tests['succeeded'], num_tests['failed'])
 

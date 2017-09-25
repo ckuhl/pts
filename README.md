@@ -18,7 +18,7 @@ so I figured it would be a good learning experience.
 
 ## Getting started
 You'll need the PyYAML module installed, and then simply add the script to your
-script directory to use it wherever.
+path to use it wherever.
 
 ## Usage
     $ test.py
@@ -61,10 +61,12 @@ script directory to use it wherever.
 
     ---
     program: REQUIRED
+    name: OPTIONAL
     tests: REQUIRED
       - name: REQUIRED
         in: REQUIRED
         args: OPTIONAL
         out: REQUIRED
+        stdout: OPTIONAL
 ...
 
