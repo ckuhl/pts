@@ -1,4 +1,4 @@
-#!/usr/bin/python3.5
+#!/home/chris/dev/pts/env/bin/python3
 import argparse
 import logging
 import os
@@ -62,14 +62,14 @@ for suite in testfile:
 
     # check that suite name matches
     try:
-        log.info("%s %s",
-                suite['name'],
-                '=' * (80 - 1 - len(suite['name'])))
         if args.test_name:
-            if suite['name'] == args.test_name:
+            if args.test_name in suite['tags'] :
                 pass
             else:
                 continue
+        log.info("%s %s",
+                suite['name'],
+                '=' * (80 - 1 - len(suite['name'])))
     except KeyError:
         pass
 
@@ -125,6 +125,10 @@ for suite in testfile:
 
     log.debug('=' * 80)
 
-log.warning('%d tests run, with %d successful and %d failing',
-        num_tests['total'], num_tests['succeeded'], num_tests['failed'])
+# Testing summary
+if num_tests['failed']:
+    log.warning('%d tests run: %d succeeded and %d failed',
+            num_tests['total'], num_tests['succeeded'], num_tests['failed'])
+else:
+    low.warning('%d tests run: All succeeded', num_tests['total'])
 

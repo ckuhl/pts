@@ -1,7 +1,8 @@
 ---
 
 program: [./ex.py]
-name: "ex.py"
+name: "ex.py - example program"
+tags: ["ex.py"]
 tests:
   - name: "Two plus two"
     in: "2 2"

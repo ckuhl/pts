@@ -60,8 +60,9 @@ path to use it wherever.
 ## Generally
 
     ---
-    program: REQUIRED
-    name: OPTIONAL
+    program: REQUIRED - command to run
+    name: OPTIONAL - human-readable program name
+    tags: OPTIONAL - tags to run tests by
     tests: REQUIRED
       - name: REQUIRED
         in: REQUIRED
