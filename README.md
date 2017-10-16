@@ -1,6 +1,6 @@
 # pts
 ## Python Test Suite
-A test suite based on YAML files.
+A test suite built on YAML.
 
 ## Motivation
 Previously I have been using a bash script put together as an assignment for
@@ -21,7 +21,7 @@ You'll need the PyYAML module installed, and then simply add the script to your
 path to use it wherever.
 
 ## Usage
-    $ test.py
+    $ pts.py -vvvv
     Testing: ['./ex.py'] ===========================================================
     Test failed: Failing test
       In: 1
@@ -61,6 +61,7 @@ path to use it wherever.
 
     ---
     program: REQUIRED - command to run
+    pipe_to: OPTIONAL - command(s) to pipe the output to
     name: OPTIONAL - human-readable program name
     tags: OPTIONAL - tags to run tests by
     tests: REQUIRED
@@ -68,10 +69,14 @@ path to use it wherever.
         in: REQUIRED
         args: OPTIONAL
         out: REQUIRED
-        stdout: OPTIONAL
+        stderr: OPTIONAL
 ...
 
 ## Up next
 - [ ] Membership tests (e.g. "SUCCESS" in stdout)
-- [ ] Arbitrary piping
+- [ ] Arbitrary piping (e.g. a -> b -> ... -> y -> z)
+- [ ] Clean up code a little
+- [ ] Add colour to the output
+- [ ] Fix up logging levels
+- [ ] Fix up logging output
 
