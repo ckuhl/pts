@@ -71,3 +71,7 @@ path to use it wherever.
         stdout: OPTIONAL
 ...
 
+## Up next
+- [ ] Membership tests (e.g. "SUCCESS" in stdout)
+- [ ] Arbitrary piping
+

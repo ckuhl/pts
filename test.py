@@ -1,4 +1,4 @@
-#!/home/chris/dev/pts/env/bin/python3
+#!/home/christian/dev/pts/env/bin/python3
 import argparse
 import logging
 import os
@@ -56,6 +56,11 @@ num_tests = {'succeeded': 0, 'failed': 0, 'total': 0}
 # loop through test cases
 for suite in testfile:
     program = suite['program']
+    try:
+        piped = suite['pipe_to']
+    except KeyError:
+        piped = None
+
     log.info('Testing: %s %s',
             program,
             '=' * (80 - 1 - len('Testing: ' + str(program))))
@@ -73,6 +78,8 @@ for suite in testfile:
     except KeyError:
         pass
 
+    # TODO: Make this antifragile
+
     for test in suite['tests']:
 
         # Check for arguments
@@ -82,13 +89,24 @@ for suite in testfile:
             command = [*program]
 
         run = subprocess.run(command,
-                             input=test['in'].encode('utf-8'),
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
+                input=test['in'].encode('utf-8'),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE)
+
+        stdout, stderr = '', ''
+
+        if piped:
+            pipe_run = subprocess.run(piped,
+                    input=run.stdout,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE)
+
+            stderr += run.stderr.decode('utf-8')
+            run = pipe_run
 
         # gather outputs
-        stdout = run.stdout.decode('utf-8')
-        stderr = run.stderr.decode('utf-8')
+        stdout += run.stdout.decode('utf-8')
+        stderr += run.stderr.decode('utf-8')
         expected_stdout = test['out']
         try:
             expected_stderr = test['stderr']
@@ -130,5 +148,5 @@ if num_tests['failed']:
     log.warning('%d tests run: %d succeeded and %d failed',
             num_tests['total'], num_tests['succeeded'], num_tests['failed'])
 else:
-    low.warning('%d tests run: All succeeded', num_tests['total'])
+    log.warning('%d tests run: All succeeded', num_tests['total'])
 
