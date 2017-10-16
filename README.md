@@ -1,24 +1,24 @@
 # pts
 ## Python Test Suite
-A test suite built on YAML.
+A test suite built on YAML
 
 ## Motivation
 Previously I have been using a bash script put together as an assignment for
-CS 246, however that has left me with a few annoyances. This is meant to solve
-those problems:
+CS 246, however that has left me with a few annoyances. This is meant to
+solve those problems:
 
-- having one file instead of 3 files for each test, multiplied by however many
-  test cases I have
+- having one file instead of 3 files for each test, multiplied by however
+  many test cases I have
 - being more resistant to breakage (something about me and shell scripting
   does not mix)
 - more easily extensible (in the future)
 
-In addition, I have not used python to build a shell program like this before,
-so I figured it would be a good learning experience.
+In addition, I have not used python to build a shell program like this
+before, so I figured it would be a good learning experience.
 
 ## Getting started
-You'll need the PyYAML module installed, and then simply add the script to your
-path to use it wherever.
+You'll need the PyYAML module installed, and then simply add the script to
+your path to use it wherever.
 
 ## Usage
     $ pts.py -vvvv
@@ -32,7 +32,6 @@ path to use it wherever.
 
 ## Format
     ---
-
     program: [./ex.py]
     tests:
       - name: "Two plus two"
@@ -54,29 +53,27 @@ path to use it wherever.
          2
          3
         out: "6"
-
     ...
 
 ## Generally
 
     ---
-    program: REQUIRED - command to run
-    pipe_to: OPTIONAL - command(s) to pipe the output to
-    name: OPTIONAL - human-readable program name
-    tags: OPTIONAL - tags to run tests by
-    tests: REQUIRED
-      - name: REQUIRED
-        in: REQUIRED
-        args: OPTIONAL
-        out: REQUIRED
-        stderr: OPTIONAL
-...
+    program: the command to run
+    pipe_to: (optional) command(s) to pipe the output to
+    name: (optional) human-readable program name
+    tags: (optional) list of tags to run tests by
+    tests:
+      - name: human-readable test name
+        in: input (or empty)
+        args: (optional) program arguments
+        out: expected output (or empty)
+        stderr: (optional) expected standard error
+    ...
 
 ## Up next
-- [ ] Membership tests (e.g. "SUCCESS" in stdout)
-- [ ] Arbitrary piping (e.g. a -> b -> ... -> y -> z)
-- [ ] Clean up code a little
-- [ ] Add colour to the output
-- [ ] Fix up logging levels
-- [ ] Fix up logging output
+- Membership tests (e.g. "SUCCESS" in stdout)
+- Arbitrary piping (e.g. a -> b -> ... -> y -> z)
+- Clean up code a little
+- Add colour to the output
+- Fix up logging levels
 

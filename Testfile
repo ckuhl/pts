@@ -1,5 +1,4 @@
 ---
-
 program: [./ex.py]
 name: "ex.py - example program"
 tags: [ex.py]
@@ -27,6 +26,5 @@ tests:
          2
          3
     out: "6"
-
 ...
 

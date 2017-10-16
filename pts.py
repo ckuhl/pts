@@ -1,4 +1,4 @@
-#!/home/chris/dev/pts/env/bin/python3
+#!/usr/bin/python3.5
 import argparse
 import logging
 import os
@@ -33,11 +33,10 @@ verb_log = {
         3: logging.INFO,
         4: logging.DEBUG,
 }
-logging.basicConfig(level=verb_log[args.verbose])
+
+# comment out format to get modules to work together
+logging.basicConfig(level=verb_log[args.verbose], format='')
 log = logging.getLogger(__name__)
-ch = logging.StreamHandler()
-ch.setLevel(logging.DEBUG)
-log.addHandler(ch)
 
 
 # get files in invoking directory
