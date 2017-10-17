@@ -61,6 +61,11 @@ class Suite(object):
         except KeyError:
             self.has_tags = False
         self.tests = [Test(x) for x in suite['tests']]
+        try:
+            self.file_in = suite['file_in']
+            self.has_file_in = True
+        except KeyError:
+            self.has_file_in = False
 
 
     def run(self, test):
@@ -76,8 +81,13 @@ class Suite(object):
         if test.has_args:
             command = [*command, *test.args]
 
+        test_in = test.input
+        if self.has_file_in:
+            test_in = open(self.file_in, 'r').read() + test_in
+        test_in = test_in.encode('utf-8')
+
         cmd_in = subprocess.run(command,
-                input=test.input.encode('utf-8'),
+                input=test_in,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
 
