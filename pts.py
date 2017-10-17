@@ -40,8 +40,7 @@ log = logging.getLogger(__name__)
 
 
 # get files in invoking directory
-files = [ f for f in os.listdir( os.curdir ) if os.path.isfile(f) ]
-testfile = None
+files = [f for f in os.listdir(os.curdir) if os.path.isfile(f)]
 
 # look for a Testfile
 if 'Testfile' in files:
@@ -55,16 +54,17 @@ num_tests = {'succeeded': 0, 'failed': 0, 'total': 0}
 
 # loop through suites
 for suite in [_pts.Suite(x) for x in testfile]:
-    log.info('Testing: %s %s',
-            suite.program,
-            '=' * (80 - 1 - len('Testing: ' + str(suite.program))))
-
     # check that suite name matches
     try:
         if args.test_name:
             if args.test_name in suite.tags:
-                pass
+                log.info('Testing: %s %s',
+                        suite.program,
+                        '=' * (80 - 1 - len('Testing: ' + str(suite.program))))
             else:
+                log.debug('Skipping: %s %s',
+                        suite.program,
+                        '=' * (80 - 1 - len('Skipping: ' + str(suite.program))))
                 continue
         log.info("%s %s",
                 suite.name,
@@ -80,7 +80,7 @@ for suite in [_pts.Suite(x) for x in testfile]:
             num_tests['failed'] += 1
         num_tests['total'] += 1
 
-    log.debug('=' * 80)
+    log.info('=' * 80)
 
 
 # Testing summary

@@ -6,7 +6,16 @@ log = logging.getLogger(__name__)
 
 
 class Test(object):
+    """
+    A Test is a set of inputs, arguments, and expected outputs
+    """
     def __init__(self, test):
+        """
+        Set up all the parts of the test, and set flags
+
+        :param test: A dictionary of field names : field values
+        :return: None
+        """
         self.name = test['name']
         self.input = test['in']
         try:
@@ -29,7 +38,16 @@ class Test(object):
 
 
 class Suite(object):
+    """
+    A Suite contains a given command, and the tests that should be run on it
+    """
     def __init__(self, suite):
+        """
+        Construct the suite from a dictionary
+
+        :param suite: Dict of field : parameter mappings
+        :return: None
+        """
         self.program = suite['program']
         try:
             self.pipe_to = suite['pipe_to']
@@ -42,13 +60,19 @@ class Suite(object):
 
 
     def run(self, test):
-        success = True
+        """
+        Run a given test
 
-        command = [*self.program]
+        :param test: Test
+        :return: Bool
+        """
+        is_successful = True
+
+        command = self.program
         if test.has_args:
             command = [*command, *test.args]
 
-        run = subprocess.run(command,
+        cmd_in = subprocess.run(command,
                 input=test.input.encode('utf-8'),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE)
@@ -58,35 +82,32 @@ class Suite(object):
         if self.is_piped:
             for p in self.pipe_to:
                 pipe_run = subprocess.run(p,
-                        input=run.stdout,
+                        input=cmd_in.stdout,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
 
-                stderr += run.stderr.decode('utf-8')
-                run = pipe_run
+                stderr += cmd_in.stderr.decode('utf-8')
+                cmd_in = pipe_run
 
         # gather outputs
-        stdout += run.stdout.decode('utf-8')
-        stderr += run.stderr.decode('utf-8')
+        stdout += cmd_in.stdout.decode('utf-8')
+        stderr += cmd_in.stderr.decode('utf-8')
 
         if test.has_stdout and stdout != test.stdout:
-            success = False
-            log.warning('expected_stdout: %s', test.stdout)
-            log.warning('stdout: ' + stdout)
+            is_successful = False
+            log.warning('Expected stdout:\n%s', test.stdout)
+            log.warning('Actual stdout:\n%s', stdout)
             if len(test.stdout) != len(stdout):
-                log.warning('expected len: %d,  Actual len: %d',
+                log.warning('Expected len: %d,\tactual len: %d',
                         len(test.stdout), len(stdout))
 
         if test.has_stderr and stderr != test.stderr:
-            success = False
-            log.warning('expected_stderr: %s', test.stderr)
-            log.warning('stderr: ' + stderr)
+            is_successful = False
+            log.warning('Expected stderr:\n%s', test.stderr)
+            log.warning('Actual stderr:\n', stderr)
             if len(test.stderr) != len(stderr):
-                log.warning('expected len: %d,  Actual len: %d',
+                log.warning('Expected len: %d,\tactual len: %d',
                         len(test.stderr), len(stderr))
 
-        if success:
-            return True
-        else:
-            return False
+        return is_successful
 

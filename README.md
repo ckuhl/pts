@@ -71,9 +71,12 @@ your path to use it wherever.
     ...
 
 ## Up next
-- Membership tests (e.g. "SUCCESS" in stdout)
+- Membership tests
+	- e.g. `test: ... in_stdout: "SUCCESS"`
 - Arbitrary piping (e.g. a -> b -> ... -> y -> z)
+	- combine "program" and "pipe_to" into one list of commands
 - Clean up code a little
-- Add colour to the output
+	- make main script fairly clean
+- Add colour to the logging
 - Fix up logging levels
 
