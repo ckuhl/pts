@@ -55,7 +55,11 @@ class Suite(object):
         except KeyError:
             self.is_piped = False
         self.name = suite['name']
-        self.tags = set(suite['tags'])
+        try:
+            self.tags = set(suite['tags'])
+            self.has_tags = True
+        else:
+            self.has_tags = False
         self.tests = [Test(x) for x in suite['tests']]
 
 

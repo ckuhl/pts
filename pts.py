@@ -56,7 +56,7 @@ num_tests = {'succeeded': 0, 'failed': 0, 'total': 0}
 for suite in [_pts.Suite(x) for x in testfile]:
     # check that suite name matches
     try:
-        if args.test_name:
+        if suite.has_tags and args.test_name:
             if args.test_name in suite.tags:
                 log.info('Testing: %s %s',
                         suite.program,
