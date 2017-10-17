@@ -58,7 +58,7 @@ class Suite(object):
         try:
             self.tags = set(suite['tags'])
             self.has_tags = True
-        else:
+        except KeyError:
             self.has_tags = False
         self.tests = [Test(x) for x in suite['tests']]
 
