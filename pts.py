@@ -9,10 +9,16 @@ import yaml
 import _pts
 
 
+__version__ = (0, 0, 1)
+
 # command line options
 parser = argparse.ArgumentParser(
-        prog='pts - Python Test Suite',
+        prog='PythonTestSuite',
         description='Run plaintext tests against scripts')
+parser.add_argument(
+        '--version',
+        action='version',
+        version='%(prog)s {v[0]}.{v[1]}.{v[2]}'.format(v=__version__))
 parser.add_argument(
         'test_name',
         help='Optional test name to run only one suite',

@@ -75,6 +75,8 @@ class Suite(object):
         :param test: Test
         :return: Bool
         """
+
+        log.info('%s %s', test.name, '-' * (80 - 1 - len(test.name)))
         is_successful = True
 
         command = self.program
