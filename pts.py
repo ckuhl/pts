@@ -21,7 +21,7 @@ parser.add_argument(
         version='%(prog)s {v[0]}.{v[1]}.{v[2]}'.format(v=__version__))
 parser.add_argument(
         'test_name',
-        help='Optional test name to run only one suite',
+        help='optional test name to run only one suite',
         nargs='?',
         default='')
 parser.add_argument(
@@ -29,6 +29,12 @@ parser.add_argument(
         help='add verbosity (-v to -vvvv)',
         action='count',
         default=0)
+parser.add_argument(
+        '--directory', '-d',
+        help='specify the directory containing the Testfile',
+        action='store',
+        default='')
+
 args = parser.parse_args()
 
 # configure logging (logger and console handler)
@@ -46,11 +52,13 @@ log = logging.getLogger(__name__)
 
 
 # get files in invoking directory
-files = [f for f in os.listdir(os.curdir) if os.path.isfile(f)]
-
+directory = os.curdir
+if args.directory:
+    directory = os.path.join(directory, args.directory)
+files = [f for f in os.listdir(directory) if os.path.isfile(os.path.join(directory, f))]
 # look for a Testfile
 if 'Testfile' in files:
-    testfile = yaml.load_all(open('Testfile', 'r'))
+    testfile = yaml.load_all(open(os.path.join(directory, 'Testfile'), 'r'))
 else:
     log.info('No Testfile found in current directory')
     sys.exit()
@@ -80,7 +88,7 @@ for suite in [_pts.Suite(x) for x in testfile]:
 
     # run tests
     for test in suite.tests:
-        if suite.run(test):
+        if suite.run(test, directory):
             num_tests['succeeded'] += 1
         else:
             num_tests['failed'] += 1

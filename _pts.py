@@ -68,11 +68,12 @@ class Suite(object):
             self.has_file_in = False
 
 
-    def run(self, test):
+    def run(self, test, directory):
         """
         Run a given test
 
         :param test: Test
+        :param directory: path to run tests from
         :return: Bool
         """
 
@@ -91,7 +92,8 @@ class Suite(object):
         cmd_in = subprocess.run(command,
                 input=test_in,
                 stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
+                stderr=subprocess.PIPE,
+                cwd=directory)
 
         stdout, stderr = '', ''
 
@@ -100,7 +102,8 @@ class Suite(object):
                 pipe_run = subprocess.run(p,
                         input=cmd_in.stdout,
                         stdout=subprocess.PIPE,
-                        stderr=subprocess.PIPE)
+                        stderr=subprocess.PIPE,
+                        cwd=directory)
 
                 stderr += cmd_in.stderr.decode('utf-8')
                 cmd_in = pipe_run

@@ -13,62 +13,75 @@ solve those problems:
   does not mix)
 - more easily extensible (in the future)
 
-In addition, I have not used python to build a shell program like this
-before, so I figured it would be a good learning experience.
+In addition, I figured it would be a good learning experience for building
+command-line programs using Python.
 
 ## Getting started
 You'll need the PyYAML module installed, and then simply add the script to
 your path to use it wherever.
 
+If you have python3.5 and virtualenv installed, you can test it locally
+instead. All you have to do is run:
+`make setup` to set up a virtualenvironment and then
+
+`make demo`
+
 ## Usage
-    $ pts.py -vvvv
-    Testing: ['./ex.py'] ===========================================================
-    Test failed: Failing test
-      In: 1
-      Expected: 0
-      Out: 1
-    ================================================================================
-    4 tests run, with 3 successful and 1 failing
+```
+$ pts.py -vvvv
+Testing: ['./ex.py'] ===========================================================
+Test failed: Failing test
+In: 1
+Expected: 0
+Out: 1
+================================================================================
+4 tests run, with 3 successful and 1 failing
+```
 
 ## Format
-    ---
-    program: [./ex.py]
-    tests:
-      - name: "Two plus two"
-        in: "2 2"
-        out: "4"
+```YAML
+---
+program: [./ex.py]
+tests:
+- name: "Two plus two"
+in: "2 2"
+out: "4"
 
-      - name: "Multiplication"
-        in: "2 3"
-        args: "-m"
-        out: "6"
+- name: "Multiplication"
+in: "2 3"
+args: "-m"
+out: "6"
 
-      - name: "Failing test"
-        in: "1"
-        out: "0"
+- name: "Failing test"
+in: "1"
+out: "0"
 
-      - name: "Multiline test"
-        in: |+
-         1
-         2
-         3
-        out: "6"
-    ...
+- name: "Multiline test"
+in: |+
+ 1
+ 2
+ 3
+out: "6"
+...
+```
 
 ## Generally
 
-    ---
-    program: the command to run
-    pipe_to: (optional) command(s) to pipe the output to
-    name: (optional) human-readable program name
-    tags: (optional) list of tags to run tests by
-    tests:
-      - name: human-readable test name
-        in: input (or empty)
-        args: (optional) program arguments
-        out: expected output (or empty)
-        stderr: (optional) expected standard error
-    ...
+```YAML
+---
+program: [<list of arguments>]
+pipe_to: [<program to pull output from>]
+file_in: <optional file to feed into stdin before each test>
+name: <human readable name>
+tags: [<list of tags to run using>]
+tests:
+  - name: "Human readable name"
+    in: "input to program"
+    args: [<optional>]
+    out: "expected output from program"
+    stderr: "<optional>"
+...
+```
 
 ## Up next
 - Membership tests
@@ -77,6 +90,7 @@ your path to use it wherever.
 	- combine "program" and "pipe_to" into one list of commands
 - Clean up code a little
 	- make main script fairly clean
+	- refactor to remove directory arg from Suite.run()
 - Add colour to the logging
 - Fix up logging levels
 

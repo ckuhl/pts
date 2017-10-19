@@ -2,14 +2,15 @@ ENV=env
 PYTHON=env/bin/python3
 PIP=env/bin/pip
 
-SCRIPT=test.py
+SCRIPT=pts.py
 
-.PHONY: clean setup
+
+.PHONY: clean demo setup
 clean:
 	find . -regex "\(.*__pycache__.*\|*.py[co]\)" -delete
 
-run:
-	${PYTHON} ${SCRIPT}
+demo:
+	${PYTHON} ${SCRIPT} -d example -vvvv
 
 setup:
 	test -d ${ENV} || virtualenv -p /usr/bin/python3.5 --no-site-packages ${ENV}
