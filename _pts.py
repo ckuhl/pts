@@ -123,10 +123,32 @@ class Suite(object):
         if test.has_stderr and stderr != test.stderr:
             is_successful = False
             log.warning('Expected stderr:\n%s', test.stderr)
-            log.warning('Actual stderr:\n', stderr)
+            log.warning('Actual stderr:\n%s', stderr)
             if len(test.stderr) != len(stderr):
                 log.warning('Expected len: %d,\tactual len: %d',
                         len(test.stderr), len(stderr))
 
         return is_successful
+
+
+class TestSuite(object):
+    """
+    Wrapper class for Suites, which in turn wrap Tests
+    """
+    def __init__(self, directory=None):
+        """
+        Configure accoring to command line args
+
+        :param directory: Directory to run in (defaults to current directory)
+        :return: None
+        """
+        # TODO: Move more pts.py logic to here
+        ...
+
+    def run(self):
+        """
+        Run the appropriate tests according to command line input
+        """
+        # TODO: Copy more of the pts.py run-loop to here
+        ...
 

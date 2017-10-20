@@ -93,4 +93,5 @@ tests:
 	- refactor to remove directory arg from Suite.run()
 - Add colour to the logging
 - Fix up logging levels
+- allow <C-c> cancelling without complaining
 
