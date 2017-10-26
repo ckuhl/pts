@@ -84,13 +84,14 @@ tests:
 ```
 
 ## Up next
+- Clean up code a little
+	- make main script fairly clean
+	- refactor to remove directory arg from Suite.run()
+	- look into ways to abstract endless `try ... except` and `if ... else`
 - Membership tests
 	- e.g. `test: ... in_stdout: "SUCCESS"`
 - Arbitrary piping (e.g. a -> b -> ... -> y -> z)
 	- combine "program" and "pipe_to" into one list of commands
-- Clean up code a little
-	- make main script fairly clean
-	- refactor to remove directory arg from Suite.run()
 - Add colour to the logging
 - Fix up logging levels
 - allow <C-c> cancelling without complaining

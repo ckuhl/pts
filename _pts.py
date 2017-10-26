@@ -29,12 +29,31 @@ class Test(object):
             self.has_stdout = True
         except KeyError:
             self.has_stdout = False
+        try:
+            if self.has_stdout:
+                raise KeyError
+            self.stdout = test['stdout']
+            self.has_stdout = True
+        except KeyError:
+            self.has_stdout = False
+
+        try:
+            self.stdout_membership = test['in_stdout']
+            self.has_stdout_membership = True
+        except KeyError:
+            self.has_stdout_membership = False
 
         try:
             self.stderr = test['stderr']
             self.has_stderr = True
         except KeyError:
             self.has_stderr = False
+
+        try:
+            self.std_err_membership = test['in_stderr']
+            self.has_stderr_membership = True
+        except KeyError:
+            self.has_stderr_membership = False
 
 
 class Suite(object):
