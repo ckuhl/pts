@@ -1,8 +1,14 @@
+import difflib
 import logging
 import subprocess
 
 
 log = logging.getLogger(__name__)
+
+
+def visual_diff(expected, actual):
+    return ''.join(difflib.ndiff(expected.splitlines(keepends=True),
+        actual.splitlines(keepends=True)))
 
 
 class Test(object):
@@ -38,7 +44,7 @@ class Test(object):
             self.has_stdout = False
 
         try:
-            self.stdout_membership = test['in_stdout']
+            self.stdout_contains = test['stdout_contains']
             self.has_stdout_membership = True
         except KeyError:
             self.has_stdout_membership = False
@@ -50,7 +56,7 @@ class Test(object):
             self.has_stderr = False
 
         try:
-            self.std_err_membership = test['in_stderr']
+            self.stderr_contains = test['stderr_contains']
             self.has_stderr_membership = True
         except KeyError:
             self.has_stderr_membership = False
@@ -133,8 +139,9 @@ class Suite(object):
 
         if test.has_stdout and stdout != test.stdout:
             is_successful = False
-            log.warning('Expected stdout:\n%s', test.stdout)
-            log.warning('Actual stdout:\n%s', stdout)
+            # log.warning('Expected stdout:\n%s', test.stdout)
+            # log.warning('Actual stdout:\n%s', stdout)
+            log.warning(visual_diff(test.stdout, stdout))
             if len(test.stdout) != len(stdout):
                 log.warning('Expected len: %d,\tactual len: %d',
                         len(test.stdout), len(stdout))
@@ -146,6 +153,18 @@ class Suite(object):
             if len(test.stderr) != len(stderr):
                 log.warning('Expected len: %d,\tactual len: %d',
                         len(test.stderr), len(stderr))
+
+        if test.has_stdout_membership and test.stdout_contains not in stdout:
+            is_successful = False
+            log.warning('Expected to find "%s" in stdout\n',
+                    test.stdout_contains)
+            log.info('Actual stdout:\n%s', stdout)
+
+        if test.has_stderr_membership and test.stderr_contains not in stderr:
+            is_successful = False
+            log.warning('Expected to find "%s" in stderr\n',
+                    test.stderr_contains)
+            log.info('Actual stderr:\n%s', stderr)
 
         return is_successful
 

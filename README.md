@@ -95,4 +95,6 @@ tests:
 - Add colour to the logging
 - Fix up logging levels
 - allow <C-c> cancelling without complaining
+- add diff switch (e.g. --diff / --raw-output)
+- add special case for printing empty output
 
