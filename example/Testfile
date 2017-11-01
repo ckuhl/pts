@@ -5,26 +5,26 @@ tags: [ex.py]
 tests:
   - name: "Two plus two"
     in: "2 2"
-    out: "4"
+    stdout: "4"
 
   - name: "Multiplication"
     in: "2 3"
     args: [-m]
-    out: "6"
+    stdout: "6"
 
   - name: "Multiple addition"
     in: "1 2 3 4 5"
-    out: "15"
+    stdout: "15"
 
   - name: "Failing test"
     in: "1"
-    out: "0"
+    stdout: "0"
 
   - name: "Multiline test"
     in: |+
          1
          2
          3
-    out: "6"
+    stdout: "6"
 ...
 

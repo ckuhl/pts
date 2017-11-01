@@ -12,6 +12,9 @@ log = logging.getLogger(__name__)
 
 
 def main():
+    """
+    Run the whole testsuite
+    """
     __version__ = (0, 0, 3)
 
     # command line options
@@ -42,6 +45,10 @@ def main():
             help='specify the directory containing the Testfile',
             action='store',
             default='')
+    parser.add_argument(
+            '--diff',
+            help='Show incorrect outputs as a diff',
+            action='store_true')
 
     args = parser.parse_args()
 
@@ -55,17 +62,26 @@ def main():
     }
 
     # combine q/v to allow aliases (e.g. alias pts='pts -vvvv' and then use -q)
-    verbosity_level = max(0, min(5, args.verbose - args.quiet))
+    verbosity_level = max(0, min(4, args.verbose - args.quiet))
 
     logging.basicConfig(level=verb_log[verbosity_level], format='')
     log = logging.getLogger(__name__)
 
-    ts = TestSuite(directory=args.directory)
-    ts.run()
-
-
+    ts = TestSuite(directory=args.directory, diff=args.diff)
+    try:
+        ts.run()
+    except KeyboardInterrupt:
+        log.info("User stopped process")
+        sys.exit()
 
 def visual_diff(expected, actual):
+    """
+    Create a better representation of the differences in outputs
+
+    :param expected: Expected output
+    :param actual: Actual output
+    :return: Diff of outputs, marked up to show what changed
+    """
     return ''.join(difflib.ndiff(expected.splitlines(keepends=True),
         actual.splitlines(keepends=True)))
 
@@ -152,7 +168,7 @@ class Suite(object):
             self.has_file_in = False
 
 
-    def run(self, test, directory):
+    def run(self, test, directory, diff):
         """
         Run a given test
 
@@ -198,17 +214,22 @@ class Suite(object):
 
         if test.has_stdout and stdout != test.stdout:
             is_successful = False
-            # log.warning('Expected stdout:\n%s', test.stdout)
-            # log.warning('Actual stdout:\n%s', stdout)
-            log.warning(visual_diff(test.stdout, stdout))
+            if diff:
+                log.warning(visual_diff(test.stdout, stdout))
+            else:
+                log.warning('Expected stdout:\n%s', test.stdout)
+                log.warning('Actual stdout:\n%s', stdout)
             if len(test.stdout) != len(stdout):
                 log.warning('Expected len: %d,\tactual len: %d',
                         len(test.stdout), len(stdout))
 
         if test.has_stderr and stderr != test.stderr:
             is_successful = False
-            log.warning('Expected stderr:\n%s', test.stderr)
-            log.warning('Actual stderr:\n%s', stderr)
+            if diff:
+                log.warning(visual_diff(test.stderr, stderr))
+            else:
+                log.warning('Expected stderr:\n%s', test.stderr)
+                log.warning('Actual stderr:\n%s', stderr)
             if len(test.stderr) != len(stderr):
                 log.warning('Expected len: %d,\tactual len: %d',
                         len(test.stderr), len(stderr))
@@ -232,7 +253,7 @@ class TestSuite(object):
     """
     Wrapper class for Suites, which in turn wrap Tests
     """
-    def __init__(self, directory=None, test_name=None):
+    def __init__(self, directory=None, test_name=None, diff=False):
         """
         Configure accoring to command line args
 
@@ -242,6 +263,8 @@ class TestSuite(object):
         self.directory = os.curdir
         if directory:
             self.directory = os.path.join(self.directory, directory)
+
+        self.diff_output = diff
 
         self.test_name = test_name
 
@@ -282,7 +305,7 @@ class TestSuite(object):
 
             # run tests
             for test in suite.tests:
-                if suite.run(test, self.directory):
+                if suite.run(test, self.directory, self.diff_output):
                     num_tests['succeeded'] += 1
                 else:
                     num_tests['failed'] += 1
