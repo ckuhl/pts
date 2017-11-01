@@ -3,6 +3,7 @@ import difflib
 import logging
 import os
 import subprocess
+import sys
 
 import yaml
 

@@ -97,4 +97,7 @@ tests:
 - allow <C-c> cancelling without complaining
 - add diff switch (e.g. --diff / --raw-output)
 - add special case for printing empty output
+- fix up distribution method / packaging
+- clean up setup.py
+- make update checklist (e.g. update README, update docs, etc.)
 
