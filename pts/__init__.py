@@ -1,9 +1,67 @@
+import argparse
 import difflib
 import logging
+import os
 import subprocess
+
+import yaml
 
 
 log = logging.getLogger(__name__)
+
+
+def main():
+    __version__ = (0, 0, 3)
+
+    # command line options
+    parser = argparse.ArgumentParser(
+            prog='PythonTestSuite',
+            description='Run plaintext tests against scripts')
+    parser.add_argument(
+            '--version',
+            action='version',
+            version='%(prog)s {v[0]}.{v[1]}.{v[2]}'.format(v=__version__))
+    parser.add_argument(
+            'test_name',
+            help='optional test name to run only one suite',
+            nargs='?',
+            default='')
+    parser.add_argument(
+            '--verbose', '-v',
+            help='add verbosity (-v to -vvvv)',
+            action='count',
+            default=0)
+    parser.add_argument(
+            '--quiet', '-q',
+            help='reduce verbosity (-q to -qqqq)',
+            action='count',
+            default=0)
+    parser.add_argument(
+            '--directory', '-d',
+            help='specify the directory containing the Testfile',
+            action='store',
+            default='')
+
+    args = parser.parse_args()
+
+    # configure logging (logger and console handler)
+    verb_log = {
+            0: logging.CRITICAL,
+            1: logging.ERROR,
+            2: logging.WARNING,
+            3: logging.INFO,
+            4: logging.DEBUG,
+    }
+
+    # combine q/v to allow aliases (e.g. alias pts='pts -vvvv' and then use -q)
+    verbosity_level = max(0, min(5, args.verbose - args.quiet))
+
+    logging.basicConfig(level=verb_log[verbosity_level], format='')
+    log = logging.getLogger(__name__)
+
+    ts = TestSuite(directory=args.directory)
+    ts.run()
+
 
 
 def visual_diff(expected, actual):
@@ -173,20 +231,69 @@ class TestSuite(object):
     """
     Wrapper class for Suites, which in turn wrap Tests
     """
-    def __init__(self, directory=None):
+    def __init__(self, directory=None, test_name=None):
         """
         Configure accoring to command line args
 
         :param directory: Directory to run in (defaults to current directory)
         :return: None
         """
-        # TODO: Move more pts.py logic to here
-        ...
+        self.directory = os.curdir
+        if directory:
+            self.directory = os.path.join(self.directory, directory)
+
+        self.test_name = test_name
 
     def run(self):
         """
         Run the appropriate tests according to command line input
         """
-        # TODO: Copy more of the pts.py run-loop to here
-        ...
+        files = [f for f in os.listdir(self.directory) if os.path.isfile(os.path.join(self.directory, f))]
+        # look for a Testfile
+        if 'Testfile' in files:
+            testfile = yaml.load_all(open(os.path.join(self.directory, 'Testfile'), 'r'))
+        else:
+            log.info('No Testfile found in current directory')
+            sys.exit()
+
+        # test counter
+        num_tests = {'succeeded': 0, 'failed': 0, 'total': 0}
+
+        # loop through suites
+        for suite in [Suite(x) for x in testfile]:
+            # check that suite name matches
+            try:
+                if suite.has_tags and self.test_name:
+                    if self.test_name in suite.tags:
+                        log.info('Testing: %s %s',
+                                suite.program,
+                                '=' * (80 - 1 - len('Testing: ' + str(suite.program))))
+                    else:
+                        log.debug('Skipping: %s %s',
+                                suite.program,
+                                '=' * (80 - 1 - len('Skipping: ' + str(suite.program))))
+                        continue
+                log.info("%s %s",
+                        suite.name,
+                        '=' * (80 - 1 - len(suite.name)))
+            except KeyError:
+                pass
+
+            # run tests
+            for test in suite.tests:
+                if suite.run(test, self.directory):
+                    num_tests['succeeded'] += 1
+                else:
+                    num_tests['failed'] += 1
+                num_tests['total'] += 1
+
+            log.info('=' * 80)
+
+
+        # Testing summary
+        if num_tests['failed']:
+            log.warning('%d tests run: %d succeeded and %d failed',
+                    num_tests['total'], num_tests['succeeded'], num_tests['failed'])
+        else:
+            log.warning('%d tests run: All succeeded', num_tests['total'])
 
