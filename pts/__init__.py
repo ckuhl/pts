@@ -67,7 +67,9 @@ def main():
     logging.basicConfig(level=verb_log[verbosity_level], format='')
     log = logging.getLogger(__name__)
 
-    ts = TestSuite(directory=args.directory, diff=args.diff)
+    ts = TestSuite(directory=args.directory,
+            diff=args.diff,
+            test_name=args.test_name)
     try:
         ts.run()
     except KeyboardInterrupt:
@@ -98,7 +100,13 @@ class Test(object):
         :return: None
         """
         self.name = test['name']
-        self.input = test['in']
+
+        try:
+            self.input = test['in']
+            self.has_input = True
+        except KeyError:
+            self.has_input = False
+
         try:
             self.args = test['args']
             self.has_args = True
@@ -184,7 +192,10 @@ class Suite(object):
         if test.has_args:
             command = [*command, *test.args]
 
-        test_in = test.input
+        if test.has_input:
+            test_in = test.input
+        else:
+            test_in = ''
         if self.has_file_in:
             test_in = open(self.file_in, 'r').read() + test_in
         test_in = test_in.encode('utf-8')
@@ -274,8 +285,11 @@ class TestSuite(object):
         """
         files = [f for f in os.listdir(self.directory) if os.path.isfile(os.path.join(self.directory, f))]
         # look for a Testfile
-        if 'Testfile' in files:
-            testfile = yaml.load_all(open(os.path.join(self.directory, 'Testfile'), 'r'))
+        tf_names = ['Testfile', 'testfile', 'Testfile.yml', 'testfile.yml']
+        for filename in tf_names:
+            if filename in files:
+                testfile = yaml.load_all(open(os.path.join(self.directory, filename), 'r'))
+                break
         else:
             log.info('No Testfile found in current directory')
             sys.exit()
