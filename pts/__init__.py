@@ -101,11 +101,20 @@ class Test(object):
         """
         self.name = test['name']
 
+        # TODO: This removes any input if both "in" and "stdin" defined
+        # maybe have a conflict crash the program..?
         try:
-            self.input = test['in']
-            self.has_input = True
+            self.stdin = test['in']
+            self.has_stdin = True
         except KeyError:
-            self.has_input = False
+            self.has_stdin = False
+        try:
+            if self.has_stdin:
+                raise KeyError
+            self.stdin = test['stdin']
+            self.has_stdin = True
+        except KeyError:
+            self.has_stdin = False
 
         try:
             self.args = test['args']
@@ -113,6 +122,8 @@ class Test(object):
         except KeyError:
             self.has_args = False
 
+        # TODO: This removes any output comp if both "out" and "stdout" defined
+        # maybe have a conflict crash the program..?
         try:
             self.stdout = test['out']
             self.has_stdout = True
@@ -192,8 +203,8 @@ class Suite(object):
         if test.has_args:
             command = [*command, *test.args]
 
-        if test.has_input:
-            test_in = test.input
+        if test.has_stdin:
+            test_in = test.stdin
         else:
             test_in = ''
         if self.has_file_in:

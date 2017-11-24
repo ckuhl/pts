@@ -86,8 +86,10 @@ tests:
 ## Up next
 - Clean up code a little
 	- make main script fairly clean
-	- refactor to remove directory arg from Suite.run()
+	- refactor to remove directory arg from Suite.run() (?)
 	- look into ways to abstract endless `try ... except` and `if ... else`
+	- refactor from `__init__.py` into proper files
+	- fix test setup for vars with multiple names (in/stdin, out/stdout)
 - Arbitrary piping (e.g. a -> b -> ... -> y -> z)
 	- combine "program" and "pipe_to" into one list of commands
 - Add colour to the logging
